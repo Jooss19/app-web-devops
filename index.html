@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Registro de Visitas - SIU</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .preview-img {
+            aspect-ratio: 4/3;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
+
+    <!-- Navbar Header -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-graduation-cap text-2xl text-yellow-400"></i>
+                <h1 class="text-xl font-bold tracking-wide">SIU - Control de Visitas a Colegios</h1>
+            </div>
+            <span class="bg-indigo-800 text-indigo-100 text-xs px-3 py-1.5 rounded-full font-medium">
+                Distrito de David, Chiriquí
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- LADO IZQUIERDO: Formulario de Registro / Edición -->
+        <section class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-6 pb-2 border-b border-slate-100">
+                <h2 id="formTitle" class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-indigo-600"></i>
+                    <span>Registro de Visita</span>
+                </h2>
+                <button id="btnCancelEdit" onclick="cancelarEdicion()" class="hidden text-xs text-rose-600 hover:underline font-semibold">
+                    Cancelar edición
+                </button>
+            </div>
+
+            <form id="visitForm" class="space-y-4" onsubmit="guardarRegistro(event)">
+                <input type="hidden" id="editId" value="">
+
+                <!-- Colegio -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre del Colegio *</label>
+                    <input type="text" id="nombreColegio" required placeholder="Ej. Colegio Félix Olivares" 
+                        class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <!-- Ubicación & Distrito -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ubicación *</label>
+                        <input type="text" id="ubicacion" required placeholder="Ej. Calle 4ta Este" 
+                            class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Distrito *</label>
+                        <select id="distrito" required class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                            <option value="David">David</option>
+                            <option value="Dolega">Dolega</option>
+                            <option value="Bugaba">Bugaba</option>
+                            <option value="Boquete">Boquete</option>
+                            <option value="Barú">Barú</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cant. Estudiantes & Día -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Estudiantes *</label>
+                        <input type="number" id="cantidadEstudiantes" min="1" required placeholder="Ej. 450" 
+                            class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Día de Visita *</label>
+                        <select id="dia" required class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miércoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                            <option value="Sábado">Sábado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Hora (24h) & Persona -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Hora (24 Horas) *</label>
+                        <input type="time" id="hora" required 
+                            class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre Persona *</label>
+                        <input type="text" id="nombrePersona" required placeholder="Ej. Juan Pérez" 
+                            class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Observación -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Observación</label>
+                    <textarea id="observacion" rows="2" placeholder="Detalles de la visita realizada..." 
+                        class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Subir Fotos (Min 2, Max 4) -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase">Fotografías (Mín 2, Máx 4) *</label>
+                        <span id="photoCounter" class="text-xs text-slate-500 font-medium">0 seleccionadas</span>
+                    </div>
+                    <input type="file" id="fotoInput" accept="image/*" multiple onchange="manejarSeleccionFotos(event)"
+                        class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                    <p id="photoError" class="text-xs text-rose-600 mt-1 hidden font-medium"></p>
+                    
+                    <!-- Previsualización de Fotos -->
+                    <div id="previewContainer" class="grid grid-cols-4 gap-2 mt-3 min-h-[60px] p-2 border border-dashed border-slate-200 rounded-lg bg-slate-50">
+                        <div class="col-span-4 text-center text-xs text-slate-400 py-3">Sin imágenes cargadas</div>
+                    </div>
+                </div>
+
+                <!-- Botón Guardar -->
+                <button type="submit" id="btnSubmit" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Guardar Registro</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- LADO DERECHO: Tabla de Registros Registrados -->
+        <section class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-2 border-b border-slate-100">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        <span>Visitas Registradas</span>
+                    </h2>
+                    <p class="text-xs text-slate-500">Gestione o exporte los registros del personal SIU</p>
+                </div>
+                <button onclick="generarJSONEnvio()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium shadow flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Simular Envío JSON</span>
+                </button>
+            </div>
+
+            <!-- Tabla Responsive -->
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200">
+                        <tr>
+                            <th class="p-3">Colegio</th>
+                            <th class="p-3">Ubicación / Distrito</th>
+                            <th class="p-3">Día / Hora</th>
+                            <th class="p-3">Fotos</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitsTableBody" class="divide-y divide-slate-100">
+                        <!-- Se llena dinámicamente con JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL: Visualizar Fotos -->
+    <div id="photoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white max-w-2xl w-full rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Fotografías Adjuntas</h3>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modalGallery" class="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1">
+                <!-- Fotos grandes -->
+            </div>
+            <div class="text-right pt-2 border-t border-slate-100">
+                <button onclick="cerrarModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-lg text-xs">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Previsualizar JSON de Envío -->
+    <div id="jsonModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 max-w-2xl w-full rounded-2xl p-6 shadow-2xl space-y-4 text-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-emerald-400 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-code"></i> JSON Generado para Envío de Correo
+                </h3>
+                <button onclick="cerrarJsonModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400">Este es el contenido estructurado que el prototipo remitirá al correo del supervisor o docente:</p>
+            <pre id="jsonPreview" class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-emerald-300 overflow-x-auto max-h-[50vh] border border-slate-800"></pre>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button onclick="cerrarJsonModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-lg text-xs">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Lógica CRUD + Validaciones -->
+    <script>
+        // Almacenamiento local temporal para simular DB / Backend
+        let visitas = JSON.parse(localStorage.getItem('siu_visitas')) || [
+            {
+                id: '1',
+                nombreColegio: 'Colegio Félix Olivares Contreras',
+                ubicacion: 'Calle 4ta Este',
+                distrito: 'David',
+                cantidadEstudiantes: 1200,
+                dia: 'Lunes',
+                hora: '09:30',
+                nombrePersona: 'Carlos Mendoza',
+                observacion: 'Supervisión de equipos informáticos.',
+                fotos: [
+                    'https://picsum.photos/400/300?random=1',
+                    'https://picsum.photos/400/300?random=2'
+                ]
+            }
+        ];
+
+        let fotosCargadasBase64 = [];
+
+        // Inicializar tabla
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarTabla();
+        });
+
+        // Convertir archivos de imagen seleccionados a Base64
+        function manejarSeleccionFotos(event) {
+            const files = Array.from(event.target.files);
+            const errorElement = document.getElementById('photoError');
+            const counterElement = document.getElementById('photoCounter');
+            
+            errorElement.classList.add('hidden');
+
+            if (files.length < 2 || files.length > 4) {
+                errorElement.innerText = "Debe seleccionar entre 2 y 4 fotos obligatoriamente.";
+                errorElement.classList.remove('hidden');
+                document.getElementById('fotoInput').value = '';
+                counterElement.innerText = "0 seleccionadas";
+                fotosCargadasBase64 = [];
+                renderPrevisualizacionFotos();
+                return;
+            }
+
+            counterElement.innerText = `${files.length} seleccionadas`;
+            fotosCargadasBase64 = [];
+
+            let procesados = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    fotosCargadasBase64.push(e.target.result);
+                    procesados++;
+                    if (procesados === files.length) {
+                        renderPrevisualizacionFotos();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPrevisualizacionFotos() {
+            const container = document.getElementById('previewContainer');
+            if (fotosCargadasBase64.length === 0) {
+                container.innerHTML = `<div class="col-span-4 text-center text-xs text-slate-400 py-3">Sin imágenes cargadas</div>`;
+                return;
+            }
+
+            container.innerHTML = fotosCargadasBase64.map((src, idx) => `
+                <div class="relative group rounded-md overflow-hidden border border-slate-200">
+                    <img src="${src}" class="w-full preview-img rounded-md">
+                    <span class="absolute top-1 left-1 bg-slate-900/70 text-white text-[10px] px-1.5 rounded">#${idx + 1}</span>
+                </div>
+            `).join('');
+        }
+
+        // Guardar o Actualizar Registro (CRUD)
+        function guardarRegistro(e) {
+            e.preventDefault();
+
+            const editId = document.getElementById('editId').value;
+            const errorElement = document.getElementById('photoError');
+
+            // Validar Fotos
+            if (fotosCargadasBase64.length < 2 || fotosCargadasBase64.length > 4) {
+                errorElement.innerText = "Error: Se requieren entre 2 y 4 fotografías para guardar.";
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            const registro = {
+                id: editId ? editId : Date.now().toString(),
+                nombreColegio: document.getElementById('nombreColegio').value.trim(),
+                ubicacion: document.getElementById('ubicacion').value.trim(),
+                distrito: document.getElementById('distrito').value,
+                cantidadEstudiantes: parseInt(document.getElementById('cantidadEstudiantes').value),
+                dia: document.getElementById('dia').value,
+                hora: document.getElementById('hora').value,
+                nombrePersona: document.getElementById('nombrePersona').value.trim(),
+                observacion: document.getElementById('observacion').value.trim(),
+                fotos: [...fotosCargadasBase64]
+            };
+
+            if (editId) {
+                // Actualizar (Update)
+                visitas = visitas.map(v => v.id === editId ? registro : v);
+            } else {
+                // Crear (Create)
+                visitas.push(registro);
+            }
+
+            guardarEnLocalStorage();
+            renderizarTabla();
+            resetearFormulario();
+        }
+
+        // Renderizar registros en la tabla (Read)
+        function renderizarTabla() {
+            const tbody = document.getElementById('visitsTableBody');
+
+            if (visitas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-6 text-slate-400">No hay visitas registradas aún.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = visitas.map(v => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3">
+                        <div class="font-bold text-slate-800">${v.nombreColegio}</div>
+                        <div class="text-[11px] text-slate-500">Persona: ${v.nombrePersona} | Est: ${v.cantidadEstudiantes}</div>
+                    </td>
+                    <td class="p-3">
+                        <div>${v.ubicacion}</div>
+                        <span class="inline-block bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-200 mt-0.5">${v.distrito}</span>
+                    </td>
+                    <td class="p-3">
+                        <div class="font-medium">${v.dia}</div>
+                        <div class="text-slate-500 text-[11px]"><i class="fa-regular fa-clock text-[10px]"></i> ${v.hora} hrs</div>
+                    </td>
+                    <td class="p-3">
+                        <button onclick="verFotos('${v.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 border border-indigo-200">
+                            <i class="fa-solid fa-images"></i> ${v.fotos.length} Fotos
+                        </button>
+                    </td>
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="cargarParaEditar('${v.id}')" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded transition" title="Editar">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="eliminarRegistro('${v.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded transition" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Cargar datos en el formulario para editar
+        function cargarParaEditar(id) {
+            const v = visitas.find(item => item.id === id);
+            if (!v) return;
+
+            document.getElementById('editId').value = v.id;
+            document.getElementById('nombreColegio').value = v.nombreColegio;
+            document.getElementById('ubicacion').value = v.ubicacion;
+            document.getElementById('distrito').value = v.distrito;
+            document.getElementById('cantidadEstudiantes').value = v.cantidadEstudiantes;
+            document.getElementById('dia').value = v.dia;
+            document.getElementById('hora').value = v.hora;
+            document.getElementById('nombrePersona').value = v.nombrePersona;
+            document.getElementById('observacion').value = v.observacion;
+
+            fotosCargadasBase64 = [...v.fotos];
+            document.getElementById('photoCounter').innerText = `${fotosCargadasBase64.length} guardadas`;
+            renderPrevisualizacionFotos();
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> Editar Visita`;
+            document.getElementById('btnSubmit').innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Actualizar Registro`;
+            document.getElementById('btnSubmit').className = "w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm rounded-lg shadow transition flex items-center justify-center gap-2";
+            document.getElementById('btnCancelEdit').classList.remove('hidden');
+        }
+
+        function cancelarEdicion() {
+            resetearFormulario();
+        }
+
+        function resetearFormulario() {
+            document.getElementById('visitForm').reset();
+            document.getElementById('editId').value = '';
+            fotosCargadasBase64 = [];
+            document.getElementById('photoCounter').innerText = '0 seleccionadas';
+            document.getElementById('photoError').classList.add('hidden');
+            renderPrevisualizacionFotos();
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-600"></i> Registro de Visita`;
+            document.getElementById('btnSubmit').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Registro`;
+            document.getElementById('btnSubmit').className = "w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow transition flex items-center justify-center gap-2";
+            document.getElementById('btnCancelEdit').classList.add('hidden');
+        }
+
+        // Eliminar Registro (Delete)
+        function eliminarRegistro(id) {
+            if (confirm('¿Está seguro de que desea eliminar este registro de visita?')) {
+                visitas = visitas.filter(v => v.id !== id);
+                guardarEnLocalStorage();
+                renderizarTabla();
+            }
+        }
+
+        // Ver Fotos en Modal
+        function verFotos(id) {
+            const v = visitas.find(item => item.id === id);
+            if (!v) return;
+
+            document.getElementById('modalTitle').innerText = `Fotografías - ${v.nombreColegio}`;
+            const gallery = document.getElementById('modalGallery');
+            gallery.innerHTML = v.fotos.map((src, i) => `
+                <div class="border rounded-lg overflow-hidden bg-slate-100">
+                    <img src="${src}" class="w-full h-48 object-cover">
+                    <div class="p-1.5 text-[10px] text-center text-slate-500 font-medium">Foto #${i + 1}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('photoModal').classList.remove('hidden');
+            document.getElementById('photoModal').classList.add('flex');
+        }
+
+        function cerrarModal() {
+            document.getElementById('photoModal').classList.add('hidden');
+            document.getElementById('photoModal').classList.remove('flex');
+        }
+
+        // Generar archivo JSON para simular el envío de correo al supervisor
+        function generarJSONEnvio() {
+            if (visitas.length === 0) {
+                alert('No hay visitas registradas para exportar.');
+                return;
+            }
+
+            const payload = {
+                remitente: "personal_siu@utp.ac.pa",
+                destinatario: "docente_supervisor@utp.ac.pa",
+                fecha_generacion: new Date().toISOString(),
+                total_registros: visitas.length,
+                visitas: visitas
+            };
+
+            document.getElementById('jsonPreview').textContent = JSON.stringify(payload, null, 2);
+            document.getElementById('jsonModal').classList.remove('hidden');
+            document.getElementById('jsonModal').classList.add('flex');
+        }
+
+        function cerrarJsonModal() {
+            document.getElementById('jsonModal').classList.add('hidden');
+            document.getElementById('jsonModal').classList.remove('flex');
+        }
+
+        function guardarEnLocalStorage() {
+            localStorage.setItem('siu_visitas', JSON.stringify(visitas));
+        }
+    </script>
+</body>
+</html>
